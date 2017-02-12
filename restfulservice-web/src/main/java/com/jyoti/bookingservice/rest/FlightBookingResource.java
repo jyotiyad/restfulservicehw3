@@ -63,13 +63,14 @@ public class FlightBookingResource {
         return new Itineraries(itineraries);
     }
 
-    @Path("/bookTicket")
+    @Path("/bookTicket/{token}/{travellerFullName}/{creditCardNumber}")
     @POST
+    @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.TEXT_PLAIN)
-    public String bookTicket(@FormParam("token")String token,
-                             @FormParam("travellerFullName")String travellerFullName,
-                             @FormParam("creditCardNumber")String creditCardNumber,
-                             @FormParam("itinerary")Itinerary itinerary)
+    public String bookTicket(@PathParam("token")String token,
+                             @PathParam("travellerFullName")String travellerFullName,
+                             @PathParam("creditCardNumber")String creditCardNumber,
+                             Itinerary itinerary)
             throws AuthenticationException, SeatNotAvailableException, InvalidCardDetailsException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
