@@ -6,6 +6,7 @@ import com.jyoti.bookingservice.flight.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Set;
 
 @Path("/flightservice")
@@ -23,40 +24,41 @@ public class FlightBookingResource {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public String login(@FormParam("username") String username,
-                        @FormParam("password") String password) throws AuthenticationException {
+                        @FormParam("password") String password) {
         boolean isAuthenticated = authService.authenticateUser(username, password);
         if (isAuthenticated) {
             String token = authService.generateToken();
             return token;
         } else {
-            throw new AuthenticationException("Invalid username and password");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
     }
 
     @Path("/search/{token}/{departureCity}/{destinationCity}")
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    public Itineraries searchItinerary(@PathParam("token")String token,
-                                          @PathParam("departureCity")String departureCity,
-                                          @PathParam("destinationCity")String destinationCity) throws AuthenticationException {
+    public Itineraries searchItinerary(@PathParam("token") String token,
+                                       @PathParam("departureCity") String departureCity,
+                                       @PathParam("destinationCity") String destinationCity) {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
-            throw new AuthenticationException("Invalid Token");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
         Set<Itinerary> itineraries = flightService.searchFlights(departureCity, destinationCity);
         return new Itineraries(itineraries);
     }
-    @Path("/AvailableItinerary")
+
+    @Path("/searchAvailableItinerary")
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    public Itineraries searchAvailableItinerary(@FormParam("token")String token,
-                                                   @FormParam("departureCity")String departureCity,
-                                                   @FormParam("destinationCity")String destinationCity,
-                                                   @FormParam("date")String date) throws AuthenticationException {
+    public Itineraries searchAvailableItinerary(@FormParam("token") String token,
+                                                @FormParam("departureCity") String departureCity,
+                                                @FormParam("destinationCity") String destinationCity,
+                                                @FormParam("date") String date) {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
-            throw new AuthenticationException("Invalid Token");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
         Set<Itinerary> itineraries = flightService.searchTicketAvailableFlights(departureCity, destinationCity, date);
@@ -67,33 +69,39 @@ public class FlightBookingResource {
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.TEXT_PLAIN)
-    public String bookTicket(@PathParam("token")String token,
-                             @PathParam("travellerFullName")String travellerFullName,
-                             @PathParam("creditCardNumber")String creditCardNumber,
-                             Itinerary itinerary)
-            throws AuthenticationException, SeatNotAvailableException, InvalidCardDetailsException {
+    public String bookTicket(@PathParam("token") String token,
+                             @PathParam("travellerFullName") String travellerFullName,
+                             @PathParam("creditCardNumber") String creditCardNumber,
+                             Itinerary itinerary){
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
-            throw new AuthenticationException("Invalid Token");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
         if (creditCardNumber == null || creditCardNumber.length() < 0) {
-            throw new InvalidCardDetailsException("credit card number should always be provided");
+            InvalidCardDetailsException invalidCardDetailsException = new InvalidCardDetailsException("credit card number should always be provided");
+            throw new WebApplicationException(invalidCardDetailsException, Response.Status.BAD_REQUEST);
         }
 
-        String ticket = flightService.bookTicket(travellerFullName,
-                creditCardNumber, itinerary);
+        String ticket = null;
+        try {
+            ticket = flightService.bookTicket(travellerFullName,
+                    creditCardNumber, itinerary);
+        } catch (SeatNotAvailableException e) {
+            throw new WebApplicationException(e);
+        }
 
         return ticket;
     }
+
     @Path("/createTicket")
     @POST
     @Produces(MediaType.APPLICATION_XML)
-    public Ticket createTicket(@FormParam("token")String token,
-                               @FormParam("ticketNumber")String ticketNumber) throws AuthenticationException, TicketNotFoundException {
+    public Ticket createTicket(@FormParam("token") String token,
+                               @FormParam("ticketNumber") String ticketNumber) throws AuthenticationException, TicketNotFoundException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
-            throw new AuthenticationException("Invalid Token");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
         Ticket ticket = flightService.getTicketDetails(ticketNumber);
