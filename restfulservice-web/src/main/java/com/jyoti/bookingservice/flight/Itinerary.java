@@ -1,7 +1,9 @@
 package com.jyoti.bookingservice.flight;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
+@XmlRootElement
 public class Itinerary {
 
     private String departureCity;

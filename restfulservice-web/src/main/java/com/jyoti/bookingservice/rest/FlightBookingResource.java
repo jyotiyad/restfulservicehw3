@@ -35,7 +35,8 @@ public class FlightBookingResource {
 
     @Path("/search/{token}/{departureCity}/{destinationCity}")
     @GET
-    public Set<Itinerary> searchItinerary(@PathParam("token")String token,
+    @Produces(MediaType.APPLICATION_XML)
+    public Itineraries searchItinerary(@PathParam("token")String token,
                                           @PathParam("departureCity")String departureCity,
                                           @PathParam("destinationCity")String destinationCity) throws AuthenticationException {
         boolean tokenValid = authService.validateToken(token);
@@ -43,12 +44,13 @@ public class FlightBookingResource {
             throw new AuthenticationException("Invalid Token");
         }
 
-        return flightService.searchFlights(departureCity, destinationCity);
+        Set<Itinerary> itineraries = flightService.searchFlights(departureCity, destinationCity);
+        return new Itineraries(itineraries);
     }
     @Path("/AvailableItinerary")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
-    public Set<Itinerary> searchAvailableItinerary(@FormParam("token")String token,
+    @Produces(MediaType.APPLICATION_XML)
+    public Itineraries searchAvailableItinerary(@FormParam("token")String token,
                                                    @FormParam("departureCity")String departureCity,
                                                    @FormParam("destinationCity")String destinationCity,
                                                    @FormParam("date")String date) throws AuthenticationException {
@@ -57,12 +59,13 @@ public class FlightBookingResource {
             throw new AuthenticationException("Invalid Token");
         }
 
-        return flightService.searchTicketAvailableFlights(departureCity, destinationCity, date);
+        Set<Itinerary> itineraries = flightService.searchTicketAvailableFlights(departureCity, destinationCity, date);
+        return new Itineraries(itineraries);
     }
 
-    /*@Path("/bookTicket")
+    @Path("/bookTicket")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)*/
+    @Produces(MediaType.TEXT_PLAIN)
     public String bookTicket(@FormParam("token")String token,
                              @FormParam("travellerFullName")String travellerFullName,
                              @FormParam("creditCardNumber")String creditCardNumber,
@@ -84,7 +87,7 @@ public class FlightBookingResource {
     }
     @Path("/createTicket")
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_XML)
     public Ticket createTicket(@FormParam("token")String token,
                                @FormParam("ticketNumber")String ticketNumber) throws AuthenticationException, TicketNotFoundException {
         boolean tokenValid = authService.validateToken(token);
