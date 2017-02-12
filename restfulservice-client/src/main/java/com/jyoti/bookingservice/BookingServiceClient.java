@@ -106,5 +106,5 @@ public class BookingServiceClient {
         System.out.println("Output from Server .... \n");
         System.out.println(output);
 
+    }
 }
-        }
