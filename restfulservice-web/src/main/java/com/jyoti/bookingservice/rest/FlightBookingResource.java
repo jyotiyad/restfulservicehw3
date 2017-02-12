@@ -4,20 +4,26 @@ import com.jyoti.bookingservice.auth.AuthenticationException;
 import com.jyoti.bookingservice.auth.AuthenticationService;
 import com.jyoti.bookingservice.flight.*;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
-public class FlightBookingService {
+@Path("/flightservice")
+public class FlightBookingResource {
 
     private AuthenticationService authService;
     private FlightService flightService;
 
-    public FlightBookingService() {
+    public FlightBookingResource() {
         this.authService = new AuthenticationService();
         this.flightService = new FlightService();
     }
 
-    public String login(String username,
-                        String password) throws AuthenticationException {
+    @Path("/login")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public String login(@FormParam("username") String username,
+                        @FormParam("password") String password) throws AuthenticationException {
         boolean isAuthenticated = authService.authenticateUser(username, password);
         if (isAuthenticated) {
             String token = authService.generateToken();
@@ -27,9 +33,11 @@ public class FlightBookingService {
         }
     }
 
-    public Set<Itinerary> searchItinerary(String token,
-                                          String departureCity,
-                                          String destinationCity) throws AuthenticationException {
+    @Path("/search/{tk}/{depc}/{destc}")
+    @GET
+    public Set<Itinerary> searchItinerary(@PathParam("tk")String token,
+                                          @PathParam("depc")String departureCity,
+                                          @PathParam("destc")String destinationCity) throws AuthenticationException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
             throw new AuthenticationException("Invalid Token");
