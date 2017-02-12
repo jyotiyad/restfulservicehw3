@@ -65,19 +65,17 @@ public class FlightBookingResource {
         return new Itineraries(itineraries);
     }
 
-    @Path("/bookTicket/{token}/{travellerFullName}/{creditCardNumber}")
+    @Path("/bookTicket")
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.TEXT_PLAIN)
-    public String bookTicket(@PathParam("token") String token,
-                             @PathParam("travellerFullName") String travellerFullName,
-                             @PathParam("creditCardNumber") String creditCardNumber,
-                             Itinerary itinerary){
-        boolean tokenValid = authService.validateToken(token);
+    public String bookTicket(BookingRequest bookingRequest){
+        boolean tokenValid = authService.validateToken(bookingRequest.getToken());
         if (!tokenValid) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
 
+        String creditCardNumber = bookingRequest.getCreditCardNumber();
         if (creditCardNumber == null || creditCardNumber.length() < 0) {
             InvalidCardDetailsException invalidCardDetailsException = new InvalidCardDetailsException("credit card number should always be provided");
             throw new WebApplicationException(invalidCardDetailsException, Response.Status.BAD_REQUEST);
@@ -85,8 +83,8 @@ public class FlightBookingResource {
 
         String ticket = null;
         try {
-            ticket = flightService.bookTicket(travellerFullName,
-                    creditCardNumber, itinerary);
+            ticket = flightService.bookTicket(bookingRequest.getTravellerFullName(),
+                    creditCardNumber, bookingRequest.getItinerary());
         } catch (SeatNotAvailableException e) {
             throw new WebApplicationException(e);
         }
