@@ -8,8 +8,13 @@ public class AuthenticationService {
     private Random random;
 
     private Set<String> tokens;
+    private static AuthenticationService authenticationService = new AuthenticationService();
 
-    public AuthenticationService() {
+    public static AuthenticationService getInstance() {
+         return authenticationService;
+    }
+
+    private AuthenticationService() {
         this.userMap = new HashMap<>();
         //add fix set up users with username as key and password as value
         userMap.put("jyoti", "jyoti123");

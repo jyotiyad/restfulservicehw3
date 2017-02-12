@@ -15,8 +15,8 @@ public class FlightBookingResource {
     private FlightService flightService;
 
     public FlightBookingResource() {
-        this.authService = new AuthenticationService();
-        this.flightService = new FlightService();
+        this.authService = AuthenticationService.getInstance();
+        this.flightService = FlightService.getInstance();
     }
 
     @Path("/login")
@@ -33,11 +33,11 @@ public class FlightBookingResource {
         }
     }
 
-    @Path("/search/{tk}/{depc}/{destc}")
+    @Path("/search/{token}/{departureCity}/{destinationCity}")
     @GET
-    public Set<Itinerary> searchItinerary(@PathParam("tk")String token,
-                                          @PathParam("depc")String departureCity,
-                                          @PathParam("destc")String destinationCity) throws AuthenticationException {
+    public Set<Itinerary> searchItinerary(@PathParam("token")String token,
+                                          @PathParam("departureCity")String departureCity,
+                                          @PathParam("destinationCity")String destinationCity) throws AuthenticationException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
             throw new AuthenticationException("Invalid Token");
@@ -45,11 +45,13 @@ public class FlightBookingResource {
 
         return flightService.searchFlights(departureCity, destinationCity);
     }
-
-    public Set<Itinerary> searchAvailableItinerary(String token,
-                                                   String departureCity,
-                                                   String destinationCity,
-                                                   String date) throws AuthenticationException {
+    @Path("/AvailableItinerary")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public Set<Itinerary> searchAvailableItinerary(@FormParam("token")String token,
+                                                   @FormParam("departureCity")String departureCity,
+                                                   @FormParam("destinationCity")String destinationCity,
+                                                   @FormParam("date")String date) throws AuthenticationException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
             throw new AuthenticationException("Invalid Token");
@@ -58,10 +60,13 @@ public class FlightBookingResource {
         return flightService.searchTicketAvailableFlights(departureCity, destinationCity, date);
     }
 
-    public String bookTicket(String token,
-                             String travellerFullName,
-                             String creditCardNumber,
-                             Itinerary itinerary)
+    /*@Path("/bookTicket")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)*/
+    public String bookTicket(@FormParam("token")String token,
+                             @FormParam("travellerFullName")String travellerFullName,
+                             @FormParam("creditCardNumber")String creditCardNumber,
+                             @FormParam("itinerary")Itinerary itinerary)
             throws AuthenticationException, SeatNotAvailableException, InvalidCardDetailsException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
@@ -77,9 +82,11 @@ public class FlightBookingResource {
 
         return ticket;
     }
-
-    public Ticket createTicket(String token,
-                               String ticketNumber) throws AuthenticationException, TicketNotFoundException {
+    @Path("/createTicket")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public Ticket createTicket(@FormParam("token")String token,
+                               @FormParam("ticketNumber")String ticketNumber) throws AuthenticationException, TicketNotFoundException {
         boolean tokenValid = authService.validateToken(token);
         if (!tokenValid) {
             throw new AuthenticationException("Invalid Token");

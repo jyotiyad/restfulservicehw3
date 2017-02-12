@@ -8,16 +8,15 @@ public class FlightService {
     private Map<Integer, FlightInventory> flightInventoryMap;
     private String[] source = {"stockholm", "malmo", "copenhagen", "paris", "berlin", "paris"};
     private String[] destination = {"paris", "copenhagen", "malmo", "stockholm", "goteborg", "berlin"};
-
     private Map<String, Ticket> bookedTicketsMap;
-    public Map<Integer, FlightInventory> getflightInventoryMap(){
-        return this.flightInventoryMap;
-    };
-    public Map<String, Ticket> getBookedTicketsMap(){
-        return this.bookedTicketsMap;
+
+    public static FlightService flightService = new FlightService();
+
+    public static FlightService getInstance() {
+        return flightService;
     }
 
-    public FlightService() {
+    private FlightService() {
         flights = new HashSet<>();
         flightInventoryMap = new HashMap<>();
         bookedTicketsMap = new HashMap<>();
