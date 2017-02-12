@@ -15,6 +15,7 @@
 
     <modules>
         <module>restfulservice-web</module>
+        <module>restfulservice-client</module>
     </modules>
     <build>
         <plugins>
