@@ -8,9 +8,11 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BookingServiceClient {
     private Client client;
+    private static BookingRequest br = new BookingRequest();
 
     public BookingServiceClient() {
         this.client = Client.create();
@@ -23,6 +25,13 @@ public class BookingServiceClient {
             String token = bookingServiceClient.login();
             bookingServiceClient.searchItinerary(token, "stockholm", "paris");
             bookingServiceClient.searchAvailableItinerary(token, "stockholm", "paris", "2017-01-01");
+            br.setCreditCardNumber("12345678");
+            ArrayList<Flight> list = new ArrayList<Flight>();
+            list.add(new Flight(1, "stockholm", "paris", "2017-01-01", 1111.0));
+            Itinerary it = new Itinerary("stockholm", "paris", list);
+            br.setItinerary(it);
+            String ticket = bookingServiceClient.bookTicket(br);
+            bookingServiceClient.createTicket(token , ticket);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,6 +48,7 @@ public class BookingServiceClient {
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.put("username", userName);
         map.put("password", password);
+        br.setTravellerFullName("test test");
 
         ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
                 .post(ClientResponse.class, map);
@@ -52,6 +62,8 @@ public class BookingServiceClient {
 
         System.out.println("Output from Server .... \n");
         System.out.println(token);
+        br.setToken(token);
+
         return token;
     }
 
@@ -106,5 +118,49 @@ public class BookingServiceClient {
         System.out.println("Output from Server .... \n");
         System.out.println(output);
 
+    }
+    private String bookTicket(BookingRequest req){
+        WebResource webResource = client
+                .resource("http://localhost:8080/rest/flightservice/bookTicket");
+
+        ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+                .post(ClientResponse.class, req);
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
+
+        String output = response.getEntity(String.class);
+
+        System.out.println("Output from Server .... \n");
+        System.out.println(output);
+
+        return output;
+    }
+    private void createTicket(String token , String ticket_num){
+        WebResource webResource = client
+                .resource("http://localhost:8080/rest/flightservice/createTicket");
+        ArrayList<String> tokenList = new ArrayList<>();
+        tokenList.add(token);
+        ArrayList<String> ticketList = new ArrayList<>();
+        ticketList.add(ticket_num);
+
+
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
+        map.put("token", tokenList);
+        map.put("ticketNumber", ticketList);
+
+        ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+                .post(ClientResponse.class, map);
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
+
+        String output = response.getEntity(String.class);
+
+        System.out.println("Output from Server .... \n");
+        System.out.println(output);
     }
 }
