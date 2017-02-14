@@ -15,7 +15,10 @@ public class FlightService {
     public static FlightService getInstance() {
         return flightService;
     }
-
+    public Map<String, Ticket> getBookedTicketsMap(){return bookedTicketsMap;}
+    public boolean tickExist(String ticket){
+        return bookedTicketsMap.containsKey(ticket);
+    }
     private FlightService() {
         flights = new HashSet<>();
         flightInventoryMap = new HashMap<>();
