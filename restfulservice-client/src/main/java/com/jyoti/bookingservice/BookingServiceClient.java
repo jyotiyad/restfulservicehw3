@@ -50,7 +50,7 @@ public class BookingServiceClient {
 
     private String login() {
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/login");
+                .resource("http://localhost:8000/rest/flightservice/login");
         ArrayList<String> userName = new ArrayList<>();
         userName.add("test");
         ArrayList<String> password = new ArrayList<>();
@@ -79,7 +79,7 @@ public class BookingServiceClient {
     }
 
     private void searchItinerary(String token, String departureCity, String destinationCity) {
-        String resource = "http://localhost:8080/rest/flightservice/search/";
+        String resource = "http://localhost:8000/rest/flightservice/search/";
         resource = resource + token + "/" + departureCity + "/" + destinationCity;
         WebResource webResource = client
                 .resource(resource);
@@ -100,7 +100,7 @@ public class BookingServiceClient {
 
     private void searchAvailableItinerary(String token, String departureCity, String destinationCity, String date) {
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/searchAvailableItinerary");
+                .resource("http://localhost:8000/rest/flightservice/searchAvailableItinerary");
         ArrayList<String> tokenList = new ArrayList<>();
         tokenList.add(token);
         ArrayList<String> departureCityList = new ArrayList<>();
@@ -132,7 +132,7 @@ public class BookingServiceClient {
     }
     private String bookTicket(BookingRequest req){
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/bookTicket");
+                .resource("http://localhost:8000/rest/flightservice/bookTicket");
         ArrayList<String> tokenList = new ArrayList<>();
         tokenList.add(req.getToken());
         ArrayList<String> departureCityList = new ArrayList<>();
@@ -173,7 +173,7 @@ public class BookingServiceClient {
     }
     private String getNameonicket(String token, String ticket_num){
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/getTicketInfo/"+ token +"/" + ticket_num);
+                .resource("http://localhost:8000/rest/flightservice/getTicketInfo/"+ token +"/" + ticket_num);
         ArrayList<String> tokenList = new ArrayList<>();
         tokenList.add(token);
         ArrayList<String> ticketList = new ArrayList<>();
@@ -195,7 +195,7 @@ public class BookingServiceClient {
 
     private void changeTicketName(String token, String ticket_num, String new_Val){
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/changeInfo/"+ticket_num);
+                .resource("http://localhost:8000/rest/flightservice/changeInfo/"+ticket_num);
         ArrayList<String> tokenList = new ArrayList<>();
         tokenList.add(token);
         ArrayList<String> ticketList = new ArrayList<>();
@@ -222,7 +222,7 @@ public class BookingServiceClient {
 
     private void createTicket(String token , String ticket_num){
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/createTicket/");
+                .resource("http://localhost:8000/rest/flightservice/createTicket/");
         ArrayList<String> tokenList = new ArrayList<>();
         tokenList.add(token);
         ArrayList<String> ticketList = new ArrayList<>();
@@ -246,7 +246,7 @@ public class BookingServiceClient {
     }
     private void cancel(String token , String ticket){
         WebResource webResource = client
-                .resource("http://localhost:8080/rest/flightservice/cancelFlight/" + token + "/" + ticket);
+                .resource("http://localhost:8000/rest/flightservice/cancelFlight/" + token + "/" + ticket);
 
         ClientResponse response = webResource.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
                 .delete(ClientResponse.class);

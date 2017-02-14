@@ -23,7 +23,7 @@ public class FlightBookingResource {
     }
 
 
-    @Path("/cancelFlight/{user_id}/{ticket_id}")
+    @Path("cancelFlight/{user_id}/{ticket_id}")
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
     public String cancel(@PathParam("user_id") String token,
